@@ -77,7 +77,7 @@ class Insta
             $medias[] = $this->getMediaByCode($post->shortcode);
         }
 
-        print_r($medias);
+        return $medias;
     }
 
     public static function searchAccountsByUsername($username)
