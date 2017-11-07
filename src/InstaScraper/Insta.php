@@ -80,6 +80,36 @@ class Insta
         return $medias;
     }
 
+    public function getMediaWithTag($username, $tag, $post_num = 20) {
+        $resPost = false;
+        $account = $this->getAccount($username);
+
+        $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+
+        $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
+
+        foreach($edges as $post) {
+            $post = (array)$post;
+            $post = $post['node'];
+
+            $caption = false;
+
+            if (isset($post->edge_media_to_caption->edges[0])) {
+                $caption = $post->edge_media_to_caption->edges[0]->node->text;
+            }
+
+            if (!$caption) {
+                continue;
+            }
+
+            if (strpos($caption, $tag) !== false) {
+                $resPost = $this->getMediaByCode($post->shortcode);
+            }
+        }
+
+        return $resPost;
+    }
+
     public static function searchAccountsByUsername($username)
     {
         // TODO: Add tests and auth
