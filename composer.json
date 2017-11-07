@@ -1,0 +1,33 @@
+{
+  "name": "RobertGrubb/insta-scraper",
+  "description": "Instagram PHP Scraper. Get account information, photos and videos without any authorization",
+  "keywords": [
+    "instagram",
+    "scraper"
+  ],
+  "type": "library",
+  "homepage": "https://github.com/RobertGrubb/insta-scraper",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "RobertGrubb",
+      "email": "mgrubb0507@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "mashape/unirest-php": "3.0.*",
+    "phpFastCache/phpFastCache": "5.0.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.5.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "InstagramScraper": "src"
+    }
+  },
+  "support": {
+    "email": "mgrubb0507@gmail.com"
+  }
+}
