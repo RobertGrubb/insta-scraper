@@ -14,6 +14,7 @@ class Media
 
     public $id;
     public $shortcode;
+    public $code;
 
     public $createdTime;
     public $type;
@@ -48,6 +49,7 @@ class Media
         $instance->type = $mediaArray['type'];
         $instance->createdTime = $mediaArray['created_time'];
         $instance->shortcode = $mediaArray['code'];
+        $instance->code = $mediaArray['code'];
         $instance->link = $mediaArray['link'];
         $instance->commentsCount = $mediaArray['comments']['count'];
         $instance->likesCount = $mediaArray['likes']['count'];
@@ -167,6 +169,7 @@ class Media
         }
         $instance->createdTime = $mediaArray['taken_at_timestamp'];
         $instance->shortcode = $mediaArray['shortcode'];
+        $instance->code = $mediaArray['shortcode'];
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
         $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
         $instance->likesCount = $mediaArray['edge_media_preview_like']['count'];
@@ -192,6 +195,7 @@ class Media
     {
         $instance = new self();
         $instance->shortcode = $mediaArray['code'];
+        $instance->code = $mediaArray['code'];
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
         $instance->commentsCount = $mediaArray['comments']['count'];
         $instance->likesCount = $mediaArray['likes']['count'];
