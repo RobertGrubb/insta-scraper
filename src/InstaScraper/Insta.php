@@ -80,6 +80,23 @@ class Insta
         return $medias;
     }
 
+    public function getTimlineMediaData($username, $post_num = 20) {
+        $medias = [];
+        $account = $this->getAccount($username);
+
+        $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+
+        $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
+
+        foreach($edges as $post) {
+            $post = (array)$post;
+            $post = $post['node'];
+            $medias[] = $post;
+        }
+
+        return $medias;
+    }
+
     public function getMediaWithTag($username, $tag, $post_num = 20) {
         $resPost = false;
         $account = $this->getAccount($username);

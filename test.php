@@ -7,5 +7,5 @@
     $Instagram = new Insta();
 
     //print_r($Instagram->getMedias('_mattGrubb'));
-    print_r($Instagram->getMediaWithTag('malcolmhall42', '#hbtjoy'));
+    print_r($Instagram->getTimlineMediaData('getheartbeatapp', 48));
 ?>
