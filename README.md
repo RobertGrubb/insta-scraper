@@ -10,6 +10,8 @@ use InstaScraper\Insta;
 $Instagram = new Insta();
 ```
 
+For main package documentation: https://github.com/postaddictme/instagram-php-scraper
+
 This fork includes the following:
 
 - getMediaWithTag()
