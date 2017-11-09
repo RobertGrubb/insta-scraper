@@ -1,8 +1,14 @@
 ## Credits to `raiym/instagram-php-scraper`
 
-To install via composer: `composer require robert-grubb/insta-scraper`
+## Installation
 
-To instantiate:
+`composer.phar require robert-grubb/insta-scraper`
+
+or
+
+`composer require robert-grubb/insta-scraper`
+
+## Instantiation
 
 ```
 use InstaScraper\Insta;
@@ -10,7 +16,11 @@ use InstaScraper\Insta;
 $Instagram = new Insta();
 ```
 
+## Documentation
+
 For main package documentation: https://github.com/postaddictme/instagram-php-scraper
+
+## Fork Information
 
 This fork includes the following:
 
