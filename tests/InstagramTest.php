@@ -2,8 +2,8 @@
 
 require '../vendor/autoload.php';
 
-use InstagramScraper\Instagram;
-use InstagramScraper\Model\Media;
+use InstaScraper\Insta;
+use InstaScraper\Model\Media;
 use phpFastCache\CacheManager;
 use PHPUnit\Framework\TestCase;
 
@@ -19,14 +19,14 @@ class InstagramTest extends TestCase
             'path' => $sessionFolder
         ]);
         $instanceCache = CacheManager::getInstance('files');
-        self::$instagram = Instagram::withCredentials('USERNAME', 'PASSWORD', $instanceCache);
+        self::$instagram = Insta::withCredentials('USERNAME', 'PASSWORD', $instanceCache);
         self::$instagram->login();
 
     }
 
     public function testGetAccountByUsername()
     {
-        $account = Instagram::getAccount('kevin');
+        $account = Insta::getAccount('kevin');
         $this->assertEquals('kevin', $account->username);
         $this->assertEquals('3', $account->id);
     }
@@ -41,13 +41,13 @@ class InstagramTest extends TestCase
 
     public function testGetMedias()
     {
-        $medias = Instagram::getMedias('kevin', 80);
+        $medias = Insta::getMedias('kevin', 80);
         $this->assertEquals(80, sizeof($medias));
     }
 
     public function testGet100Medias()
     {
-        $medias = Instagram::getMedias('kevin', 100);
+        $medias = Insta::getMedias('kevin', 100);
         $this->assertEquals(100, sizeof($medias));
     }
 

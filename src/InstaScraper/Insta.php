@@ -1,7 +1,9 @@
 <?php
 
+// Define Namespace
 namespace InstaScraper;
 
+// Uses
 use InstaScraper\Exception\InstagramAuthException;
 use InstaScraper\Exception\InstagramException;
 use InstaScraper\Exception\InstagramNotFoundException;
@@ -15,15 +17,15 @@ use Unirest\Request;
 
 class Insta
 {
+    // Set default class variables
     const MAX_COMMENTS_PER_REQUEST = 300;
     private static $instanceCache;
     public $sessionUsername;
     public $sessionPassword;
     public $userSession;
 
-    public function __construct()
-    {
-    }
+    // Class Constructor
+    public function __construct() {}
 
     public static function withCredentials($username, $password, $sessionFolder = null)
     {
@@ -44,6 +46,11 @@ class Insta
         return $instance;
     }
 
+    /**
+     * Grab instagram account information for a specific
+     * instagram account.
+     * @param string username
+     */
     public static function getAccount($username)
     {
         // Put getAccount in a retry logic block
@@ -66,29 +73,51 @@ class Insta
             }
         }
 
+        // Handle 404 response
         if ($response->code === 404) {
             throw new InstagramNotFoundException('Account with given username does not exist.');
         }
+
+        // Handle any other response that is not 200
         if ($response->code !== 200) {
             throw new InstagramException('Response code is ' . $response->code . '. Body: ' . $response->body . ' Something went wrong. Please report issue.');
         }
 
+        // Decode the data
         $userArray = json_decode($response->raw_body, true);
+
+        // If user is not set, throw exception
         if (!isset($userArray['user'])) {
             throw new InstagramException('Account with this username does not exist');
         }
+
+        // Return model
         return Account::fromAccountPage($userArray['user']);
     }
 
+    /**
+     * Get media items for a specific instagram account
+     * @param  string  $username
+     * @param  integer $post_num
+     *
+     * NEW: This now pulls from the account's timeline data
+     * via a graphql call.
+     */
     public function getMedias($username, $post_num = 20)
     {
+        // Set medias to an empty array
         $medias = [];
+
+        // Get the account information
         $account = $this->getAccount($username);
 
+        // Pull media items
         $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
 
+        // Retrieve the edges object
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
 
+        // Iterate through each and add it to the medias array.
         foreach($edges as $post) {
             $post = (array)$post;
             $post = $post['node'];
@@ -99,6 +128,15 @@ class Insta
         return $medias;
     }
 
+    /**
+     * Grabs the timeline media data for an instagram account.
+     * The difference between this and getMedias is that this
+     * will return a minimal amount of data for their Media
+     * items.
+     *
+     * @param  string  $username
+     * @param  integer $post_num
+     */
     public function getTimlineMediaData($username, $post_num = 20) {
         $medias = [];
         $account = $this->getAccount($username);
@@ -123,9 +161,13 @@ class Insta
             }
         }
 
+        // Retrieve edges object
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
 
+        // Make sure there are items
         if (count($edges) >= 1) {
+
+            // Iterate through each, and add to the medias array
             foreach($edges as $post) {
                 $post = (array)$post;
                 $post = $post['node'];
@@ -136,6 +178,14 @@ class Insta
         return $medias;
     }
 
+    /**
+     * This method will look for 1 post that has a specific
+     * hashtag in the caption.
+     *
+     * @param  string  $username
+     * @param  string  $tag
+     * @param  integer $post_num
+     */
     public function getMediaWithTag($username, $tag, $post_num = 20) {
         $resPost = false;
         $account = $this->getAccount($username);
@@ -160,23 +210,30 @@ class Insta
             }
         }
 
+        // Retrieve edges object
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
 
+        // If object has items
         if (count($edges) >= 1) {
+
+            // Iterate through each
             foreach($edges as $post) {
                 $post = (array)$post;
                 $post = $post['node'];
 
                 $caption = false;
 
+                // Set caption
                 if (isset($post->edge_media_to_caption->edges[0])) {
                     $caption = $post->edge_media_to_caption->edges[0]->node->text;
                 }
 
+                // If no caption, skip this iteration
                 if (!$caption) {
                     continue;
                 }
 
+                // If the caption contains the tag, set the variable
                 if (strpos($caption, $tag) !== false) {
                     $resPost = $this->getMediaByCode($post->shortcode);
                 }
