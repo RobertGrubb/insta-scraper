@@ -46,7 +46,26 @@ class Insta
 
     public static function getAccount($username)
     {
-        $response = Request::get(Endpoints::getAccountJsonLink($username));
+        // Put getAccount in a retry logic block
+        for ($retry = 1; $retry <= 4; $retry++) {
+
+            // Attempt to get the account
+            try {
+                $response = Request::get(Endpoints::getAccountJsonLink($username));
+
+                // Break because we have data
+                break;
+
+            } catch (Exception $e) {
+
+                if ($retry == 10) {
+                    throw new InstagramException('Account with given username does not exist.');
+                }
+
+                continue;
+            }
+        }
+
         if ($response->code === 404) {
             throw new InstagramNotFoundException('Account with given username does not exist.');
         }
@@ -84,7 +103,25 @@ class Insta
         $medias = [];
         $account = $this->getAccount($username);
 
-        $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+        // Put getAccount in a retry logic block
+        for ($retry = 1; $retry <= 4; $retry++) {
+
+            // Attempt to get the account
+            try {
+                 $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+
+                // Break because we have data
+                break;
+
+            } catch (Exception $e) {
+
+                if ($retry == 10) {
+                    throw new InstagramException('Unable to retrieve timeline media');
+                }
+
+                continue;
+            }
+        }
 
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
 
@@ -101,7 +138,25 @@ class Insta
         $resPost = false;
         $account = $this->getAccount($username);
 
-        $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+        // Put getAccount in a retry logic block
+        for ($retry = 1; $retry <= 4; $retry++) {
+
+            // Attempt to get the account
+            try {
+                $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
+
+                // Break because we have data
+                break;
+
+            } catch (Exception $e) {
+
+                if ($retry == 10) {
+                    throw new InstagramException('Account with given username does not exist.');
+                }
+
+                continue;
+            }
+        }
 
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
 
