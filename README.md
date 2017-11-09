@@ -1,5 +1,15 @@
 ## Credits to `raiym/instagram-php-scraper`
 
+To install via composer: `composer require robert-grubb/insta-scraper`
+
+To instantiate:
+
+```
+use InstaScraper\Insta;
+
+$Instagram = new Insta();
+```
+
 This fork includes the following:
 
 - getMediaWithTag()
