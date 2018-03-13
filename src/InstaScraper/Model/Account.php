@@ -87,8 +87,8 @@ class Account
     {
         $instance = new self();
         $instance->username = $userArray['username'];
-        $instance->followsCount = $userArray['follows']['count'];
-        $instance->followedByCount = $userArray['followed_by']['count'];
+        $instance->followsCount = $userArray['edge_follow']['count'];
+        $instance->followedByCount = $userArray['edge_followed_by']['count'];
         $instance->profilePicUrl = $userArray['profile_pic_url'];
         $instance->id = $userArray['id'];
         $instance->biography = $userArray['biography'];
