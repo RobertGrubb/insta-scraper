@@ -93,7 +93,7 @@ class Account
         $instance->id = $userArray['id'];
         $instance->biography = $userArray['biography'];
         $instance->fullName = $userArray['full_name'];
-        $instance->mediaCount = $userArray['media']['count'];
+        $instance->mediaCount = $userArray['edge_owner_to_timeline_media']['count'];
         $instance->isPrivate = $userArray['is_private'];
         $instance->externalUrl = $userArray['external_url'];
         $instance->isVerified = $userArray['is_verified'];
