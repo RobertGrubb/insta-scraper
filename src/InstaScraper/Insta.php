@@ -87,12 +87,12 @@ class Insta
         $userArray = json_decode($response->raw_body, true);
 
         // If user is not set, throw exception
-        if (!isset($userArray['user'])) {
+        if (!isset($userArray['graphql']['user'])) {
             throw new InstagramException('Account with this username does not exist');
         }
 
         // Return model
-        return Account::fromAccountPage($userArray['user']);
+        return Account::fromAccountPage($userArray['graphql']['user']);
     }
 
     /**
