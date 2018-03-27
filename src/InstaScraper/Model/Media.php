@@ -123,6 +123,30 @@ class Media
         return $urls;
     }
 
+    private static function getImageUrlsFromDisplayResources($displayResources) {
+        $urls = [];
+
+        foreach ($displayResources as $image) {
+            if ($image['config_width'] == 640) {
+                $urls['thumbnail'] = $image['src'];
+            }
+
+            if ($image['config_width'] == 640) {
+                $urls['low'] = $image['src'];
+            }
+
+            if ($image['config_width'] == 750) {
+                $urls['standard'] = $image['src'];
+            }
+
+            if ($image['config_width'] == 1080) {
+                $urls['high'] = $image['src'];
+            }
+        }
+
+        return $urls;
+    }
+
     public static function fromMediaPage($mediaArray)
     {
         $instance = new self();
@@ -173,7 +197,8 @@ class Media
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
         $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
         $instance->likesCount = $mediaArray['edge_media_preview_like']['count'];
-        $images = self::getImageUrls($mediaArray['display_url']);
+        // $images = self::getImageUrls($mediaArray['display_url']);
+        $images = self::getImageUrlsFromDisplayResources($mediaArray['display_resources']);
         $instance->imageStandardResolutionUrl = $images['standard'];
         $instance->imageLowResolutionUrl = $images['low'];
         $instance->imageHighResolutionUrl = $images['high'];
