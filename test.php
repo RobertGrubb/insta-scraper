@@ -4,8 +4,21 @@
 
     use InstaScraper\Insta;
 
-    $Instagram = new Insta();
+    // Instantiate Instagram library
+    $Instagram = Insta::withCredentials('<REDACTED>', '<REDACTED>');
 
-    //print_r($Instagram->getMedias('_mattGrubb'));
-    print_r($Instagram->getMedias('_mattGrubb', 14));
+    $Instagram->login();
+
+    try {
+        $media = $Instagram->getMediaWithTag('<REDACTED>', '<REDACTED>');
+
+        if (isset($media->error)) {
+            echo $media->error_reason . PHP_EOL;
+            die();
+        }
+
+        print_r($media);
+    } catch (\Exception $e) {
+        echo $e->getMessage() . PHP_EOL;
+    }
 ?>
