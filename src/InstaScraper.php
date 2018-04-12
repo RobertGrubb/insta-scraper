@@ -12,3 +12,4 @@ require_once dirname(__FILE__) . '/InstaScraper/Model/Tag.php';
 require_once dirname(__FILE__) . '/InstaScraper/Exception/InstagramException.php';
 require_once dirname(__FILE__) . '/InstaScraper/Exception/InstagramAuthException.php';
 require_once dirname(__FILE__) . '/InstaScraper/Exception/InstagramNotFoundException.php';
+require_once dirname(__FILE__) . '/InstaScraper/Exception/InstagramEncodedException.php';

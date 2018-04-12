@@ -7,6 +7,7 @@ namespace InstaScraper;
 use InstaScraper\Exception\InstagramAuthException;
 use InstaScraper\Exception\InstagramException;
 use InstaScraper\Exception\InstagramNotFoundException;
+use InstaScraper\Exception\InstagramEncodedException;
 use InstaScraper\Model\Account;
 use InstaScraper\Model\Comment;
 use InstaScraper\Model\Location;
@@ -69,18 +70,33 @@ class Insta
                     throw new InstagramException('Account with given username does not exist.');
                 }
 
+                sleep(1);
+
                 continue;
             }
         }
 
         // Handle 404 response
         if ($response->code === 404) {
-            throw new InstagramNotFoundException('Account with given username does not exist.');
+            throw new InstagramEncodedException([
+                'error_code' => 404,
+                'error_reason' => 'Account does not exist'
+            ]);
+        }
+
+        if ($response->code === 403) {
+            throw new InstagramEncodedException([
+                'error_code' => 403,
+                'error_reason' => 'Rate Limiting'
+            ]);
         }
 
         // Handle any other response that is not 200
         if ($response->code !== 200) {
-            throw new InstagramException('Response code is ' . $response->code . '. Body: ' . $response->body . ' Something went wrong. Please report issue.');
+            throw new InstagramEncodedException([
+                'error_code' => $response->code,
+                'error_reason' => 'Unknown'
+            ]);
         }
 
         preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
@@ -91,7 +107,10 @@ class Insta
 
         // If user is not set, throw exception
         if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
-            throw new InstagramException('Account with this username does not exist');
+            throw new InstagramEncodedException([
+                'error_code' => 404,
+                'error_reason' => 'Account with this username does not exist'
+            ]);
         }
 
         // Return model
@@ -118,11 +137,10 @@ class Insta
         $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
 
         if ($response->code == 403) {
-            return [
-                'error' => true,
-                'error_code' => $response->code,
-                'error_reason' => '403 Forbidden'
-            ];
+            throw new InstagramEncodedException([
+                'error_code' => 403,
+                'error_reason' => 'Rate Limited'
+            ]);
         }
 
 
@@ -218,16 +236,17 @@ class Insta
                     throw new InstagramException('Account with given username does not exist.');
                 }
 
+                sleep(1);
+
                 continue;
             }
         }
 
         if ($response->code == 403) {
-            return [
-                'error' => true,
-                'error_code' => $response->code,
-                'error_reason' => '403 Forbidden'
-            ];
+            throw new InstagramEncodedException([
+                'error_code' => 403,
+                'error_reason' => 'Rate Limited'
+            ]);
         }
 
         // Retrieve edges object
@@ -794,6 +813,15 @@ class Insta
             $csrfToken = $cookies['csrftoken'];
             $headers = ['cookie' => "csrftoken=$csrfToken; mid=$mid;", 'referer' => Endpoints::BASE_URL . '/', 'x-csrftoken' => $csrfToken];
             $response = Request::post(Endpoints::LOGIN_URL, $headers, ['username' => $this->sessionUsername, 'password' => $this->sessionPassword]);
+
+            $response->code = 403;
+
+            if ($response->code === 403) {
+                throw new InstagramEncodedException([
+                    'error_code' => 403,
+                    'error_reason' => 'Rate Limiting'
+                ]);
+            }
 
             if ($response->code !== 200) {
                 if ((is_string($response->code) || is_numeric($response->code)) && is_string($response->body)) {
