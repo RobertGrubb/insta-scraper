@@ -51,14 +51,14 @@ class Insta
      * instagram account.
      * @param string username
      */
-    public static function getAccount($username)
+    public function getAccount($username)
     {
         // Put getAccount in a retry logic block
         for ($retry = 1; $retry <= 4; $retry++) {
 
             // Attempt to get the account
             try {
-                $response = Request::get(Endpoints::getAccountJsonLink($username));
+                $response = Request::get(Endpoints::getAccountJsonLink($username), $this->generateHeaders($this->userSession));
 
                 // Break because we have data
                 break;
@@ -379,8 +379,14 @@ class Insta
             foreach ($session as $key => $value) {
                 $cookies .= "$key=$value; ";
             }
+            $cookies .= 'ig_pr=2.5; ';
+            $cookies .= 'ig_vh=961; ';
             $headers = ['cookie' => $cookies, 'referer' => Endpoints::BASE_URL . '/', 'x-csrftoken' => $session['csrftoken']];
         }
+
+        $headers['user-agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
+        $headers['x-instagram-gis'] = '4b9db4899ba710aa305d316bc9fd4677';
+        $headers['x-requested-with'] = 'XMLHttpRequest';
         return $headers;
     }
 

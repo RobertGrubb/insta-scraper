@@ -6,4 +6,4 @@ composer.lock
 phpunit.phar
 tests/sessions
 dump.rdb
-src/InstaScraper/sessions
+src/InstaScraper/sessions/cli/Files/files/**/*
