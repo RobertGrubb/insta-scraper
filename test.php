@@ -10,14 +10,14 @@
     $Instagram->login();
 
     try {
-        $media = $Instagram->getMediaWithTag('<REDACTED>', '<REDACTED>');
+        $account = $Instagram->getAccount('<REDACTED>');
 
-        if (isset($media->error)) {
-            echo $media->error_reason . PHP_EOL;
+        if (isset($account->error)) {
+            echo $account->error_reason . PHP_EOL;
             die();
         }
 
-        print_r($media);
+        var_dump($account);
     } catch (\Exception $e) {
         echo $e->getMessage() . PHP_EOL;
     }

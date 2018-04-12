@@ -58,7 +58,7 @@ class Insta
 
             // Attempt to get the account
             try {
-                $response = Request::get(Endpoints::getAccountJsonLink($username), $this->generateHeaders($this->userSession));
+                $response = Request::get(Endpoints::getAccountPageLink($username), $this->generateHeaders($this->userSession));
 
                 // Break because we have data
                 break;
@@ -83,16 +83,19 @@ class Insta
             throw new InstagramException('Response code is ' . $response->code . '. Body: ' . $response->body . ' Something went wrong. Please report issue.');
         }
 
+        preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
+		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
+
         // Decode the data
-        $userArray = json_decode($response->raw_body, true);
+        //$userArray = json_decode($response->raw_body, true);
 
         // If user is not set, throw exception
-        if (!isset($userArray['graphql']['user'])) {
+        if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
             throw new InstagramException('Account with this username does not exist');
         }
 
         // Return model
-        return Account::fromAccountPage($userArray['graphql']['user']);
+        return Account::fromAccountPage($userArray['entry_data']['ProfilePage'][0]['graphql']['user']);
     }
 
     /**
