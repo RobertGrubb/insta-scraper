@@ -814,7 +814,6 @@ class Insta
             $headers = ['cookie' => "csrftoken=$csrfToken; mid=$mid;", 'referer' => Endpoints::BASE_URL . '/', 'x-csrftoken' => $csrfToken];
             $response = Request::post(Endpoints::LOGIN_URL, $headers, ['username' => $this->sessionUsername, 'password' => $this->sessionPassword]);
 
-            $response->code = 403;
 
             if ($response->code === 403) {
                 throw new InstagramEncodedException([
