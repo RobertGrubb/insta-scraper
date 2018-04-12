@@ -122,8 +122,6 @@ class Insta
             ];
         }
 
-        echo Endpoints::getAccountMediasJsonLink($account->id, $post_num);
-
 
         // Retrieve the edges object
         $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
