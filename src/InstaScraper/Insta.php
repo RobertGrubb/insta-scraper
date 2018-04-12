@@ -58,7 +58,7 @@ class Insta
 
             // Attempt to get the account
             try {
-                $response = Request::get(Endpoints::getAccountPageLink($username), $this->generateHeaders($this->userSession));
+                $response = Request::get(Endpoints::getAccountPageLink($username));
 
                 // Break because we have data
                 break;

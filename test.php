@@ -5,12 +5,10 @@
     use InstaScraper\Insta;
 
     // Instantiate Instagram library
-    $Instagram = Insta::withCredentials('<REDACTED>', '<REDACTED>');
-
-    $Instagram->login();
+    $Instagram = new Insta();
 
     try {
-        $account = $Instagram->getAccount('<REDACTED>');
+        $account = $Instagram->getAccount('getheartbeatapp');
 
         if (isset($account->error)) {
             echo $account->error_reason . PHP_EOL;
