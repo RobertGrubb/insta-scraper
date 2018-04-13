@@ -207,8 +207,6 @@ class Insta
         // If object has items
         if (count($medias) >= 1) {
 
-            print_r($medias);
-
             // Iterate through each
             foreach($medias as $post) {
 
