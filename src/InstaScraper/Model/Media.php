@@ -147,6 +147,45 @@ class Media
         return $urls;
     }
 
+    public static function fromAccountPage($mediaArray, $owner)
+    {
+        $instance = new self();
+        $instance->id = $mediaArray['id'];
+        $instance->type = $mediaArray['is_video'] ? 'video' : 'image';
+        if ($instance->type == 'video') {
+            $instance->videoStandardResolutionUrl = $mediaArray['video_url'];
+            $instance->videoViews = $mediaArray['video_view_count'];
+        }
+        if (isset($mediaArray['caption_is_edited'])) {
+            $instance->captionIsEdited = $mediaArray['caption_is_edited'];
+        }
+        if (isset($mediaArray['is_ad'])) {
+            $instance->isAd = $mediaArray['is_ad'];
+        }
+        $instance->shortcode = $mediaArray['shortcode'];
+        $instance->code = $mediaArray['shortcode'];
+        $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
+        $instance->owner = $owner;
+        $instance->imageStandardResolutionUrl = $mediaArray['display_url'];
+        $instance->imageLowResolutionUrl = $mediaArray['display_url'];
+        $instance->imageHighResolutionUrl = $mediaArray['display_url'];
+        $instance->imageThumbnailUrl = $mediaArray['thumbnail_src'];
+        $instance->createdTime = $mediaArray['taken_at_timestamp'];
+        $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
+        $instance->likesCount = $mediaArray['edge_media_preview_like']['count'];
+        $instance->ownerId = $mediaArray['owner']['id'];
+        if (isset($mediaArray['edge_media_to_caption']['edges'][0]['node']['text'])) {
+            $instance->caption = $mediaArray['edge_media_to_caption']['edges'][0]['node']['text'];
+        }
+        if (isset($mediaArray['location']['id'])) {
+            $instance->locationId = $mediaArray['location']['id'];
+        }
+        if (isset($mediaArray['location']['name'])) {
+            $instance->locationName = $mediaArray['location']['name'];
+        }
+        return $instance;
+    }
+
     public static function fromMediaPage($mediaArray)
     {
         $instance = new self();

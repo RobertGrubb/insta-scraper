@@ -43,6 +43,11 @@ class Endpoints
         return str_replace('{username}', urlencode($username), Endpoints::ACCOUNT_JSON_INFO);
     }
 
+    public static function getAccountPageMediasLink($username)
+    {
+        return str_replace('{username}', urlencode($username), Endpoints::ACCOUNT_PAGE);
+    }
+
     public static function getAccountJsonInfoLinkByAccountId($id)
     {
         return str_replace('{userId}', urlencode($id), Endpoints::ACCOUNT_JSON_INFO_BY_ID);

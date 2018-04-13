@@ -6,33 +6,14 @@ use InstaScraper\Insta;
 use InstaScraper\Exception\InstagramEncodedException;
 
 // Instantiate Instagram library
-$Instagram = Insta::withCredentials('<REDACTED>', '<REDACTED>');
-
-$continue = true;
+$Instagram = new Insta();
 
 try {
-    $Instagram->login();
-} catch (InstagramEncodedException $e) {
-    $continue = false;
+    $medias = $Instagram->getMedias('instausername');
 
-    $details = $e->getDecodedMessage();
-
-    print_r($details);
-}
-
-if ($continue) {
-    try {
-        $account = $Instagram->getMedias('<REDACTED>');
-
-        if (isset($account->error)) {
-            echo $account->error_reason . PHP_EOL;
-            die();
-        }
-
-        var_dump($account);
-    } catch (\Exception $e) {
-        print_r($e->getMessage());
-    }
+    var_dump($medias);
+} catch (\Exception $e) {
+    print_r($e->getMessage());
 }
 
 ?>

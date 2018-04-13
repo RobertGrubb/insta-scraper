@@ -47,6 +47,45 @@ class Insta
         return $instance;
     }
 
+    public function getMediasFromPage($username, $count = 20)
+    {
+        $medias = [];
+        $index = 0;
+        $response = Request::get(Endpoints::getAccountPageMediasLink($username));
+
+        preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
+		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
+
+        // Decode the data
+        //$userArray = json_decode($response->raw_body, true);
+
+        // If user is not set, throw exception
+        if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
+            throw new InstagramEncodedException([
+                'error_code' => 404,
+                'error_reason' => 'Account with this username does not exist'
+            ]);
+        }
+
+        $owner = Account::fromAccountPage($userArray['entry_data']['ProfilePage'][0]['graphql']['user']);
+
+        $nodes = $userArray['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'];
+
+        if (!isset($nodes) || empty($nodes)) {
+            return [];
+        }
+
+        // Iterate through each and add it to the medias array.
+        foreach($nodes as $post) {
+            $post = (array)$post;
+            $post = $post['node'];
+
+            $medias[] = Media::fromAccountPage($post, $owner);
+        }
+
+        return $medias;
+    }
+
     /**
      * Grab instagram account information for a specific
      * instagram account.
@@ -130,30 +169,7 @@ class Insta
         // Set medias to an empty array
         $medias = [];
 
-        // Get the account information
-        $account = $this->getAccount($username);
-
-        // Pull media items
-        $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
-
-        if ($response->code == 403) {
-            throw new InstagramEncodedException([
-                'error_code' => 403,
-                'error_reason' => 'Rate Limited'
-            ]);
-        }
-
-
-        // Retrieve the edges object
-        $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
-
-        // Iterate through each and add it to the medias array.
-        foreach($edges as $post) {
-            $post = (array)$post;
-            $post = $post['node'];
-
-            $medias[] = $this->getMediaByCode($post->shortcode);
-        }
+        $medias = $this->getMediasFromPage($username);
 
         return $medias;
     }
@@ -169,41 +185,8 @@ class Insta
      */
     public function getTimlineMediaData($username, $post_num = 20) {
         $medias = [];
-        $account = $this->getAccount($username);
 
-        // Put getAccount in a retry logic block
-        for ($retry = 1; $retry <= 4; $retry++) {
-
-            // Attempt to get the account
-            try {
-                 $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
-
-                // Break because we have data
-                break;
-
-            } catch (Exception $e) {
-
-                if ($retry == 10) {
-                    throw new InstagramException('Unable to retrieve timeline media');
-                }
-
-                continue;
-            }
-        }
-
-        // Retrieve edges object
-        $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
-
-        // Make sure there are items
-        if (count($edges) >= 1) {
-
-            // Iterate through each, and add to the medias array
-            foreach($edges as $post) {
-                $post = (array)$post;
-                $post = $post['node'];
-                $medias[] = $post;
-            }
-        }
+        $medias = $this->getMediasFromPage($username);
 
         return $medias;
     }
@@ -216,65 +199,30 @@ class Insta
      * @param  string  $tag
      * @param  integer $post_num
      */
-    public function getMediaWithTag($username, $tag, $post_num = 20) {
+    public function getMediaWithTag($username, $tag) {
         $resPost = false;
-        $account = $this->getAccount($username);
 
-        // Put getAccount in a retry logic block
-        for ($retry = 1; $retry <= 4; $retry++) {
-
-            // Attempt to get the account
-            try {
-                $response = Request::get(Endpoints::getAccountMediasJsonLink($account->id, $post_num), $this->generateHeaders($this->userSession));
-
-                // Break because we have data
-                break;
-
-            } catch (Exception $e) {
-
-                if ($retry == 10) {
-                    throw new InstagramException('Account with given username does not exist.');
-                }
-
-                sleep(1);
-
-                continue;
-            }
-        }
-
-        if ($response->code == 403) {
-            throw new InstagramEncodedException([
-                'error_code' => 403,
-                'error_reason' => 'Rate Limited'
-            ]);
-        }
-
-        // Retrieve edges object
-        $edges = $response->body->data->user->edge_owner_to_timeline_media->edges;
+        $medias = $this->getMediasFromPage($username);
 
         // If object has items
-        if (count($edges) >= 1) {
+        if (count($medias) >= 1) {
+
+            print_r($medias);
 
             // Iterate through each
-            foreach($edges as $post) {
-                $post = (array)$post;
-                $post = $post['node'];
+            foreach($medias as $post) {
 
-                $caption = false;
-
-                // Set caption
-                if (isset($post->edge_media_to_caption->edges[0])) {
-                    $caption = $post->edge_media_to_caption->edges[0]->node->text;
+                if (!isset($post->caption)) {
+                    continue;
                 }
 
-                // If no caption, skip this iteration
-                if (!$caption) {
+                if (!$post->caption) {
                     continue;
                 }
 
                 // If the caption contains the tag, set the variable
-                if (strpos($caption, $tag) !== false) {
-                    $resPost = $this->getMediaByCode($post->shortcode);
+                if (strpos($post->caption, $tag) !== false) {
+                    $resPost = $post;
                 }
             }
         }
