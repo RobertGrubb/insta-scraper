@@ -9,7 +9,7 @@ use InstaScraper\Exception\InstagramEncodedException;
 $Instagram = new Insta();
 
 try {
-    $medias = $Instagram->getMedias('instausername');
+    $medias = $Instagram->getMedias('mlgofficial');
 
     var_dump($medias);
 } catch (\Exception $e) {

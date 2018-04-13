@@ -147,14 +147,14 @@ class Media
         return $urls;
     }
 
-    public static function fromAccountPage($mediaArray, $owner)
+    public static function fromAccountPage($mediaArray, $owner, $videoData)
     {
         $instance = new self();
         $instance->id = $mediaArray['id'];
         $instance->type = $mediaArray['is_video'] ? 'video' : 'image';
-        if ($instance->type == 'video') {
-            $instance->videoStandardResolutionUrl = $mediaArray['video_url'];
-            $instance->videoViews = $mediaArray['video_view_count'];
+        if (!is_null($videoData)) {
+            $instance->videoStandardResolutionUrl = $videoData['video_url'];
+            $instance->videoViews = $videoData['video_view_count'];
         }
         if (isset($mediaArray['caption_is_edited'])) {
             $instance->captionIsEdited = $mediaArray['caption_is_edited'];
@@ -166,8 +166,8 @@ class Media
         $instance->code = $mediaArray['shortcode'];
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
         $instance->owner = $owner;
-        $instance->imageStandardResolutionUrl = $mediaArray['display_url'];
-        $instance->imageLowResolutionUrl = $mediaArray['display_url'];
+        $instance->imageStandardResolutionUrl = isset($mediaArray['thumbnail_resources'][4]) ? $mediaArray['thumbnail_resources'][4]['src'] : null;
+        $instance->imageLowResolutionUrl = isset($mediaArray['thumbnail_resources'][3]) ? $mediaArray['thumbnail_resources'][3]['src'] : null;
         $instance->imageHighResolutionUrl = $mediaArray['display_url'];
         $instance->imageThumbnailUrl = $mediaArray['thumbnail_src'];
         $instance->createdTime = $mediaArray['taken_at_timestamp'];

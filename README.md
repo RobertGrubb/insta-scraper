@@ -1,4 +1,6 @@
-## Credits to `raiym/instagram-php-scraper`
+## information
+
+`Credits to postaddictme/instagram-php-scraper for base`
 
 ## Installation
 
@@ -30,7 +32,16 @@ This fork includes the following:
 - Fixes getMedias issue (Because instagram removed the /media page)
     - Now pulls from their timeline data via a graphql request, then grabs the data for each array item. (Increases load times, but not by much)
 
-- Retry logic for applications that request media data at a higher rate
+- Better exceptions
+    - For better understand of what is actually happening when an error occurs, InstagramEncodedException is thrown. You can catch this exception and use `InstagramEncodedException->getDecodedMessage()` that will return the following:
+
+```
+[
+    [error] => true,
+    [error_code] => 404,
+    [error_reason] => 'User does not exist'
+]
+```
 
 ## Getting a media item with specific hashtag:
 

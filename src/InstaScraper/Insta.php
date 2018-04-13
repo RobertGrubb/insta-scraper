@@ -53,13 +53,16 @@ class Insta
         $index = 0;
         $response = Request::get(Endpoints::getAccountPageMediasLink($username));
 
+        if ($response->code === 403) {
+            throw new InstagramEncodedException([
+                'error_code' => 403,
+                'error_reason' => 'Rate Limiting'
+            ]);
+        }
+
         preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
 		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
 
-        // Decode the data
-        //$userArray = json_decode($response->raw_body, true);
-
-        // If user is not set, throw exception
         if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
             throw new InstagramEncodedException([
                 'error_code' => 404,
@@ -79,8 +82,17 @@ class Insta
         foreach($nodes as $post) {
             $post = (array)$post;
             $post = $post['node'];
+            $videoData = null;
 
-            $medias[] = Media::fromAccountPage($post, $owner);
+            if ($post['is_video'] == true) {
+                $postData = $this->getMediaByCode($post['shortcode']);
+                $videoData = [
+                    'video_url' => $postData->videoStandardResolutionUrl,
+                    'video_view_count' => $postData->videoViews
+                ];
+            }
+
+            $medias[] = Media::fromAccountPage($post, $owner, $videoData);
         }
 
         return $medias;
@@ -93,27 +105,7 @@ class Insta
      */
     public function getAccount($username)
     {
-        // Put getAccount in a retry logic block
-        for ($retry = 1; $retry <= 4; $retry++) {
-
-            // Attempt to get the account
-            try {
-                $response = Request::get(Endpoints::getAccountPageLink($username));
-
-                // Break because we have data
-                break;
-
-            } catch (Exception $e) {
-
-                if ($retry == 10) {
-                    throw new InstagramException('Account with given username does not exist.');
-                }
-
-                sleep(1);
-
-                continue;
-            }
-        }
+        $response = Request::get(Endpoints::getAccountPageLink($username));
 
         // Handle 404 response
         if ($response->code === 404) {
