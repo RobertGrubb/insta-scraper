@@ -60,6 +60,13 @@ class Insta
             ]);
         }
 
+        if ($response->code != 200) {
+            throw new InstagramEncodedException([
+                'error_code' => $response->code,
+                'error_reason' => 'Unknown'
+            ]);
+        }
+
         preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
 		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
 
