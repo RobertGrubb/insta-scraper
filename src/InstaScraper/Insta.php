@@ -67,19 +67,29 @@ class Insta
             ]);
         }
 
-        preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
-		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
+		$body = preg_replace('/\s+/', '', str_replace('window.__initialDataLoaded(window._sharedData);', '', $response->raw_body));
 
-        if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
+        preg_match('/window._sharedData=(.*?);<\/script>/', $body, $data);
+
+		$sharedData = $data[0];
+
+		$sharedData = str_replace('window._sharedData=', '', $sharedData);
+		$sharedData = str_replace(';</script>', '', $sharedData);
+
+		$userArray = json_decode($sharedData);
+
+		print_r($userArray);
+
+        if (!isset($userArray->entry_data->ProfilePage->graphql->user)) {
             throw new InstagramEncodedException([
                 'error_code' => 404,
                 'error_reason' => 'Account with this username does not exist'
             ]);
         }
 
-        $owner = Account::fromAccountPage($userArray['entry_data']['ProfilePage'][0]['graphql']['user']);
+        $owner = Account::fromAccountPage($userArray->entry_data->ProfilePage->graphql->user);
 
-        $nodes = $userArray['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'];
+        $nodes = $userArray->entry_data->ProfilePage->graphql->user->edge_owner_to_timeline_media->edges;
 
         if (!isset($nodes) || empty($nodes)) {
             return [];
@@ -91,8 +101,8 @@ class Insta
             $post = $post['node'];
             $videoData = null;
 
-            if ($post['is_video'] == true) {
-                $postData = $this->getMediaByCode($post['shortcode']);
+            if ($post->is_video == true) {
+                $postData = $this->getMediaByCode($post->shortcode);
                 $videoData = [
                     'video_url' => $postData->videoStandardResolutionUrl,
                     'video_view_count' => $postData->videoViews
@@ -137,14 +147,22 @@ class Insta
             ]);
         }
 
-        preg_match('/window._sharedData\s\=\s(.*?)\;<\/script>/', $response->raw_body, $data);
-		$userArray = json_decode($data[1], true, 512, JSON_BIGINT_AS_STRING);
+		$body = preg_replace('/\s+/', '', str_replace('window.__initialDataLoaded(window._sharedData);', '', $response->raw_body));
+
+        preg_match('/window._sharedData=(.*?);<\/script>/', $body, $data);
+
+		$sharedData = $data[0];
+
+		$sharedData = str_replace('window._sharedData=', '', $sharedData);
+		$sharedData = str_replace(';</script>', '', $sharedData);
+
+		$userArray = json_decode($sharedData);
 
         // Decode the data
         //$userArray = json_decode($response->raw_body, true);
 
         // If user is not set, throw exception
-        if (!isset($userArray['entry_data']['ProfilePage'][0]['graphql']['user'])) {
+        if (!isset($userArray->entry_data->ProfilePage->graphql->user)) {
             throw new InstagramEncodedException([
                 'error_code' => 404,
                 'error_reason' => 'Account with this username does not exist'
@@ -152,7 +170,7 @@ class Insta
         }
 
         // Return model
-        return Account::fromAccountPage($userArray['entry_data']['ProfilePage'][0]['graphql']['user']);
+        return Account::fromAccountPage($userArray->entry_data->ProfilePage->graphql->user);
     }
 
     /**
