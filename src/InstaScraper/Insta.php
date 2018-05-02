@@ -78,8 +78,6 @@ class Insta
 
 		$userArray = json_decode($sharedData);
 
-		print_r($userArray);
-
         if (!isset($userArray->entry_data->ProfilePage->graphql->user)) {
             throw new InstagramEncodedException([
                 'error_code' => 404,
