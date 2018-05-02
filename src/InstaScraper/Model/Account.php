@@ -86,17 +86,17 @@ class Account
     public static function fromAccountPage($userArray)
     {
         $instance = new self();
-        $instance->username = $userArray->username;
-        $instance->followsCount = $userArray->edge_follow->count;
-        $instance->followedByCount = $userArray->edge_followed_by->count;
-        $instance->profilePicUrl = $userArray->profile_pic_url;
-        $instance->id = $userArray->id;
-        $instance->biography = $userArray->biography;
-        $instance->fullName = $userArray->full_name;
-        $instance->mediaCount = $userArray->edge_owner_to_timeline_media->count;
-        $instance->isPrivate = $userArray->is_private;
-        $instance->externalUrl = $userArray->external_url;
-        $instance->isVerified = $userArray->is_verified;
+        $instance->username = $userArray['username'];
+        $instance->followsCount = $userArray['edge_follow']['count'];
+        $instance->followedByCount = $userArray['edge_followed_by']['count'];
+        $instance->profilePicUrl = $userArray['profile_pic_url'];
+        $instance->id = $userArray['id'];
+        $instance->biography = $userArray['biography'];
+        $instance->fullName = $userArray['full_name'];
+        $instance->mediaCount = $userArray['edge_owner_to_timeline_media']['count'];
+        $instance->isPrivate = $userArray['is_private'];
+        $instance->externalUrl = $userArray['external_url'];
+        $instance->isVerified = $userArray['is_verified'];
         return $instance;
     }
 
