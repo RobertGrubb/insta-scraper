@@ -218,7 +218,7 @@ class Insta
                 }
 
                 // If the caption contains the tag, set the variable
-                if (strpos($post->caption, $tag) !== false) {
+                if (strpos(strtolower($post->caption), strtolower($tag)) !== false) {
                     $resPost = $post;
                 }
             }
