@@ -51,7 +51,20 @@ class Media
         $instance->shortcode = $mediaArray['code'];
         $instance->code = $mediaArray['code'];
         $instance->link = $mediaArray['link'];
-        $instance->commentsCount = $mediaArray['comments']['count'];
+        $instance->commentsCount = 0;
+
+        if (isset($mediaArray['comments'])) {
+            if (isset($mediaArray['comments']['count'])) {
+                $instance->commentsCount = $mediaArray['comments']['count'];
+            }
+        }
+
+        if (isset($mediaArray['edge_media_to_parent_comment'])) {
+            if (isset($mediaArray['edge_media_to_parent_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_parent_comment']['count'];
+            }
+        }
+
         $instance->likesCount = $mediaArray['likes']['count'];
         $images = self::getImageUrls($mediaArray['images']['standard_resolution']['url']);
         $instance->imageLowResolutionUrl = $images['low'];
@@ -171,7 +184,22 @@ class Media
         $instance->imageHighResolutionUrl = $mediaArray['display_url'];
         $instance->imageThumbnailUrl = $mediaArray['thumbnail_src'];
         $instance->createdTime = $mediaArray['taken_at_timestamp'];
-        $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
+
+        $instance->commentsCount = 0;
+
+        if (isset($mediaArray['edge_media_to_comment'])) {
+            if (isset($mediaArray['edge_media_to_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
+            }
+        }
+
+        if (isset($mediaArray['edge_media_to_parent_comment'])) {
+            if (isset($mediaArray['edge_media_to_parent_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_parent_comment']['count'];
+            }
+        }
+
+
         $instance->likesCount = $mediaArray['edge_media_preview_like']['count'];
         $instance->ownerId = $mediaArray['owner']['id'];
         if (isset($mediaArray['edge_media_to_caption']['edges'][0]['node']['text'])) {
@@ -234,7 +262,21 @@ class Media
         $instance->shortcode = $mediaArray['shortcode'];
         $instance->code = $mediaArray['shortcode'];
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
-        $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
+
+        $instance->commentsCount = 0;
+
+        if (isset($mediaArray['edge_media_to_comment'])) {
+            if (isset($mediaArray['edge_media_to_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_comment']['count'];
+            }
+        }
+
+        if (isset($mediaArray['edge_media_to_parent_comment'])) {
+            if (isset($mediaArray['edge_media_to_parent_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_parent_comment']['count'];
+            }
+        }
+
         $instance->likesCount = $mediaArray['edge_media_preview_like']['count'];
         // $images = self::getImageUrls($mediaArray['display_url']);
         $images = self::getImageUrlsFromDisplayResources($mediaArray['display_resources']);
@@ -261,7 +303,21 @@ class Media
         $instance->shortcode = $mediaArray['code'];
         $instance->code = $mediaArray['code'];
         $instance->link = Endpoints::getMediaPageLink($instance->shortcode);
-        $instance->commentsCount = $mediaArray['comments']['count'];
+
+        $instance->commentsCount = 0;
+
+        if (isset($mediaArray['comments'])) {
+            if (isset($mediaArray['comments']['count'])) {
+                $instance->commentsCount = $mediaArray['comments']['count'];
+            }
+        }
+
+        if (isset($mediaArray['edge_media_to_parent_comment'])) {
+            if (isset($mediaArray['edge_media_to_parent_comment']['count'])) {
+                $instance->commentsCount = $mediaArray['edge_media_to_parent_comment']['count'];
+            }
+        }
+
         $instance->likesCount = $mediaArray['likes']['count'];
         $instance->ownerId = $mediaArray['owner']['id'];
         if (isset($mediaArray['caption'])) {
