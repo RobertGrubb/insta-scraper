@@ -51,7 +51,7 @@ class Insta
     {
         $medias = [];
         $index = 0;
-        $response = Request::get(Endpoints::getAccountPageMediasLink($username));
+        $response = Request::get(Endpoints::getAccountPageMediasLink($username), $this->generateHeaders(false));
 
         if ($response->code === 403) {
             throw new InstagramEncodedException([
@@ -112,7 +112,7 @@ class Insta
      */
     public function getAccount($username)
     {
-        $response = Request::get(Endpoints::getAccountPageLink($username));
+        $response = Request::get(Endpoints::getAccountPageLink($username), $this->generateHeaders(false));
 
         // Handle 404 response
         if ($response->code === 404) {
@@ -230,7 +230,7 @@ class Insta
     public static function searchAccountsByUsername($username)
     {
         // TODO: Add tests and auth
-        $response = Request::get(Endpoints::getGeneralSearchJsonLink($username));
+        $response = Request::get(Endpoints::getGeneralSearchJsonLink($username), $this->generateHeaders(false));
         if ($response->code === 404) {
             return [
                 'error' => true,
@@ -268,7 +268,7 @@ class Insta
     public static function searchTagsByTagName($tag)
     {
         // TODO: Add tests and auth
-        $response = Request::get(Endpoints::getGeneralSearchJsonLink($tag));
+        $response = Request::get(Endpoints::getGeneralSearchJsonLink($tag), $this->generateHeaders(false));
         if ($response->code === 404) {
             return [
                 'error' => true,
