@@ -28,6 +28,49 @@ class Insta
     // Class Constructor
     public function __construct() {}
 
+    public function setProxy($config)
+    {
+        $defaultConfig = [
+            'port' => false,
+            'tunnel' => false,
+            'address' => false,
+            'type' => CURLPROXY_HTTP,
+            'timeout' => false,
+            'auth' => [
+                'user' => '',
+                'pass' => '',
+                'method' => CURLAUTH_BASIC
+            ],
+        ];
+
+        foreach ($defaultConfig as $key => $val) {
+            if ($key !== 'auth') {
+                if (!isset($config[$key])) {
+                    $config[$key] = $val;
+                }
+            }
+        }
+
+        if (isset($config['auth'])) {
+            $config['auth']['method'] = CURLAUTH_BASIC;
+        }
+
+        Request::proxy($config['address'], $config['port'], $config['type'], $config['tunnel']);
+
+        if (isset($config['auth'])) {
+            Request::proxyAuth($config['auth']['user'], $config['auth']['pass'], $config['auth']['method']);
+        }
+
+        if (isset($config['timeout'])) {
+            Request::timeout((int)$config['timeout']);
+        }
+    }
+
+    public function disableProxy()
+    {
+        Request::proxy('');
+    }
+
     public static function withCredentials($username, $password, $sessionFolder = null)
     {
         if (is_null($sessionFolder)) {
