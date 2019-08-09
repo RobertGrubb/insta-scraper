@@ -103,6 +103,13 @@ class Insta
             ]);
         }
 
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
+        }
+
         if ($response->code != 200) {
             throw new InstagramEncodedException([
                 'error_code' => $response->code,
@@ -168,6 +175,13 @@ class Insta
         if ($response->code === 403) {
             throw new InstagramEncodedException([
                 'error_code' => 403,
+                'error_reason' => 'Rate Limiting'
+            ]);
+        }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
                 'error_reason' => 'Rate Limiting'
             ]);
         }
@@ -281,6 +295,13 @@ class Insta
                 'error_reason' => 'Account with given username does not exist.'
             ];
         }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
+        }
         if ($response->code !== 200) {
             return [
                 'error' => true,
@@ -318,6 +339,13 @@ class Insta
                 'error_code' => $response->code,
                 'error_reason' => 'Account with given username does not exist.'
             ];
+        }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
         }
         if ($response->code !== 200) {
             return [
@@ -360,6 +388,13 @@ class Insta
                 'error_code' => $response->code,
                 'error_reason' => 'Media with given code does not exist or account is private.'
             ];
+        }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
         }
         if ($response->code !== 200) {
             return [
@@ -417,6 +452,13 @@ class Insta
                 'error_code' => $response->code,
                 'error_reason' => 'Unknown'
             ];
+        }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
         }
 
         $arr = json_decode($response->raw_body, true);
@@ -567,6 +609,15 @@ class Insta
         $hasNextPage = true;
         while ($index < $count && $hasNextPage) {
             $response = Request::get(Endpoints::getMediasJsonByTagLink($tag, $maxId), $this->generateHeaders($this->userSession));
+
+
+            if ($response->code === 429) {
+                throw new InstagramEncodedException([
+                    'error_code' => 429,
+                    'error_reason' => 'Rate Limiting'
+                ]);
+            }
+
             if ($response->code !== 200) {
                 return [
                     'error' => true,
@@ -708,6 +759,13 @@ class Insta
                 'error_reason' => 'Location with this id doesn\'t exist'
             ];
         }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
+        }
         if ($response->code !== 200) {
             return [
                 'error' => true,
@@ -769,6 +827,13 @@ class Insta
                 'error_code' => $response->code,
                 'error_reason' => 'Location with this id doesn\'t exist'
             ];
+        }
+
+        if ($response->code === 429) {
+            throw new InstagramEncodedException([
+                'error_code' => 429,
+                'error_reason' => 'Rate Limiting'
+            ]);
         }
         if ($response->code !== 200) {
             return [
