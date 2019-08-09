@@ -430,6 +430,12 @@ class Insta
         $headers['user-agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36';
         //$headers['x-instagram-gis'] = '4b9db4899ba710aa305d316bc9fd4677';
         $headers['x-requested-with'] = 'XMLHttpRequest';
+
+        // Instagram complains if this is not present. Doesn't matter what it is.
+        if (empty($headers['x-csrftoken'])) {
+            $headers['x-csrftoken'] = md5(uniqid());
+        }
+
         return $headers;
     }
 
